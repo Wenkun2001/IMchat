@@ -10,8 +10,8 @@ type UserBasic struct {
 	gorm.Model
 	Name          string
 	PassWord      string
-	Phone         string
-	Email         string
+	Phone         string `valid:"matches(^1[3-9]{1}\\d{9}$)"`
+	Email         string `valid:"email"`
 	Identity      string
 	CilentIP      string
 	CilentPort    string
@@ -34,3 +34,22 @@ func GetUserList() []*UserBasic {
 	}
 	return data
 }
+
+func CreateUser(user UserBasic) *gorm.DB {
+	return utils.DB.Create(&user)
+}
+
+func DeleteUser(user UserBasic) *gorm.DB {
+	return utils.DB.Delete(&user)
+}
+
+func UpdateUser(user UserBasic) *gorm.DB {
+	return utils.DB.Model(&user).Updates(UserBasic{Name: user.Name, PassWord: user.PassWord, Phone: user.Phone, Email: user.Email})
+}
+
+//// 查找某个用户
+//func FindByID(id uint) UserBasic {
+//	user := UserBasic{}
+//	utils.DB.Where("id = ?", id).First(&user)
+//	return user
+//}
