@@ -2,9 +2,12 @@ package main
 
 import (
 	"IMchat/router"
+	"IMchat/utils"
 )
 
 func main() {
+	utils.InitConfig()
+	utils.InitMySQL()
 	r := router.Router()
-	r.Run(":8089") // 监听并在 0.0.0.0:8089 上启动服务
+	r.Run(":8089") // 监听并在 localhost:8089 上启动服务
 }

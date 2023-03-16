@@ -20,6 +20,5 @@ func main() {
 	db.Create(user)
 	// Read
 	db.First(user, 1) // 根据整形主键查找
-	// Update - 将 product 的 price 更新为 200
 	db.Model(user).Update("PassWord", 123456)
 }
