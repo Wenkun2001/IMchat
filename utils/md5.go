@@ -15,7 +15,7 @@ func Md5Encode(data string) string {
 }
 
 // 大写
-func MD5Endcode(data string) string {
+func MD5Encode(data string) string {
 	return strings.ToUpper(Md5Encode(data))
 }
 

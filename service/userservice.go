@@ -39,7 +39,7 @@ func LoginUserByNameAndPwd(c *gin.Context) {
 	if user.Name == "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "该用户不存在",
+			"message": "User does not exist",
 			"data":    data,
 		})
 		return
@@ -49,7 +49,7 @@ func LoginUserByNameAndPwd(c *gin.Context) {
 	if !flag {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "密码不正确",
+			"message": "Incorrect password",
 			"data":    data,
 		})
 		return
@@ -59,7 +59,7 @@ func LoginUserByNameAndPwd(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"code":    0, //  0成功   -1失败
-		"message": "登录成功",
+		"message": "Login successfully",
 		"data":    data,
 	})
 }
@@ -84,7 +84,7 @@ func CreateUser(c *gin.Context) {
 	if user.Name == "" || password == "" || repassword == "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "用户名或密码不能为空！",
+			"message": "The username or password cannot be empty",
 			"data":    user,
 		})
 		return
@@ -92,14 +92,16 @@ func CreateUser(c *gin.Context) {
 	if data.Name != "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "用户名已注册！",
+			"message": "Username has been registered",
 			"data":    user,
 		})
 		return
 	}
 	if password != repassword {
 		c.JSON(-1, gin.H{
-			"message": "两次密码不一致！",
+			"code":    -1, //  0成功   -1失败
+			"message": "Different passwords",
+			"data":    user,
 		})
 		return
 	}
@@ -108,7 +110,9 @@ func CreateUser(c *gin.Context) {
 	user.Salt = salt
 	models.CreateUser(user)
 	c.JSON(200, gin.H{
-		"message": "Create new user information successfully",
+		"code":    0, //  0成功   -1失败
+		"message": "New user successfully",
+		"data":    user,
 	})
 }
 
@@ -124,7 +128,9 @@ func DeleteUser(c *gin.Context) {
 	user.ID = uint(id)
 	models.DeleteUser(user)
 	c.JSON(200, gin.H{
+		"code":    0, //  0成功   -1失败
 		"message": "Delete user information successfully",
+		"data":    user,
 	})
 }
 
@@ -151,12 +157,16 @@ func UpdateUser(c *gin.Context) {
 	if err != nil {
 		panic(err)
 		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
 			"message": "Parameter modification error",
+			"data":    user,
 		})
 	} else {
 		models.UpdateUser(user)
 		c.JSON(200, gin.H{
+			"code":    0, //  0成功   -1失败
 			"message": "Update user information successfully",
+			"data":    user,
 		})
 	}
 }
