@@ -14,11 +14,11 @@ func main() {
 	// 迁移 schema
 	db.AutoMigrate(&models.UserBasic{})
 
-	// Create
-	user := &models.UserBasic{}
-	user.Name = "lwk"
-	db.Create(user)
-	// Read
-	db.First(user, 1) // 根据整形主键查找
-	db.Model(user).Update("PassWord", 123456)
+	//// Create
+	//user := &models.UserBasic{}
+	//user.Name = "lwk"
+	//db.Create(user)
+	//// Read
+	//db.First(user, 1) // 根据整形主键查找
+	//db.Model(user).Update("PassWord", 123456)
 }

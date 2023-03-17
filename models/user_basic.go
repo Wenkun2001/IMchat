@@ -4,6 +4,7 @@ import (
 	"IMchat/utils"
 	"fmt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type UserBasic struct {
@@ -15,10 +16,11 @@ type UserBasic struct {
 	Identity      string
 	CilentIP      string
 	CilentPort    string
-	LoginTime     uint64
-	HeartbeatTime uint64
-	LoginOutTime  uint64 `gorm:"column:login_out_time" json:"login_out_time"`
-	IsLogout      bool
+	Salt          string
+	LoginTime     time.Time `gorm:"default:NULL"`
+	HeartbeatTime time.Time `gorm:"default:NULL"`
+	LoginOutTime  time.Time `gorm:"default:NULL"`
+	IsLoginOut    bool
 	DeviceInfo    string
 }
 
@@ -33,6 +35,28 @@ func GetUserList() []*UserBasic {
 		fmt.Println(v)
 	}
 	return data
+}
+
+func LoginUserByNameAndPwd(name string, password string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("name = ? and pass_word=?", name, password).First(&user)
+	return user
+}
+
+func FindUserByName(name string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("name = ?", name).First(&user)
+	return user
+}
+
+func FindUserByPhone(phone string) *gorm.DB {
+	user := UserBasic{}
+	return utils.DB.Where("Phone = ?", phone).First(&user)
+}
+
+func FindUserByEmail(email string) *gorm.DB {
+	user := UserBasic{}
+	return utils.DB.Where("email = ?", email).First(&user)
 }
 
 func CreateUser(user UserBasic) *gorm.DB {

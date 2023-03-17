@@ -58,6 +58,25 @@ paths:
       summary: 所有用户信息
       tags:
       - 用户模块
+  /user/loginUserByNameAndPwd:
+    post:
+      parameters:
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: password
+        in: query
+        name: password
+        type: string
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 登录用户
+      tags:
+      - 用户模块
   /user/updateUser:
     post:
       parameters:

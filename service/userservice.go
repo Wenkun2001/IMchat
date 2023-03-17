@@ -2,8 +2,11 @@ package service
 
 import (
 	"IMchat/models"
+	"IMchat/utils"
+	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"strconv"
 )
 
@@ -21,6 +24,46 @@ func GetUserList(c *gin.Context) {
 	})
 }
 
+// LoginUserByNameAndPwd
+// @Summary 登录用户
+// @Tags 用户模块
+// @param name query string false "name"
+// @param password query string false "password"
+// @Success 200 {string} json{"code","message"}
+// @Router /user/loginUserByNameAndPwd [post]
+func LoginUserByNameAndPwd(c *gin.Context) {
+	data := models.UserBasic{}
+	name := c.Request.FormValue("name")
+	password := c.Request.FormValue("password")
+	user := models.FindUserByName(name)
+	if user.Name == "" {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "该用户不存在",
+			"data":    data,
+		})
+		return
+	}
+
+	flag := utils.ValidPassword(password, user.Salt, user.PassWord)
+	if !flag {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "密码不正确",
+			"data":    data,
+		})
+		return
+	}
+	pwd := utils.MakePassword(password, user.Salt)
+	data = models.LoginUserByNameAndPwd(name, pwd)
+
+	c.JSON(200, gin.H{
+		"code":    0, //  0成功   -1失败
+		"message": "登录成功",
+		"data":    data,
+	})
+}
+
 // CreateUser
 // @Summary 新增用户信息
 // @Tags 用户模块
@@ -34,13 +77,35 @@ func CreateUser(c *gin.Context) {
 	user.Name = c.Query("name")
 	password := c.Query("password")
 	repassword := c.Query("repassword")
+
+	salt := fmt.Sprintf("%06d", rand.Int31())
+
+	data := models.FindUserByName(user.Name)
+	if user.Name == "" || password == "" || repassword == "" {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "用户名或密码不能为空！",
+			"data":    user,
+		})
+		return
+	}
+	if data.Name != "" {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "用户名已注册！",
+			"data":    user,
+		})
+		return
+	}
 	if password != repassword {
 		c.JSON(-1, gin.H{
 			"message": "两次密码不一致！",
 		})
 		return
 	}
-	user.PassWord = password
+	//user.PassWord = password
+	user.PassWord = utils.MakePassword(password, salt)
+	user.Salt = salt
 	models.CreateUser(user)
 	c.JSON(200, gin.H{
 		"message": "Create new user information successfully",
