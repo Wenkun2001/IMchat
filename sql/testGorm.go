@@ -12,7 +12,10 @@ func main() {
 		panic("failed to connect database")
 	}
 	// 迁移 schema
-	db.AutoMigrate(&models.UserBasic{})
+	//db.AutoMigrate(&models.UserBasic{})
+	//db.AutoMigrate(&models.Message{})
+	db.AutoMigrate(&models.Contact{})
+	db.AutoMigrate(&models.GroupBasic{})
 
 	//// Create
 	//user := &models.UserBasic{}
