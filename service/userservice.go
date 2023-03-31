@@ -77,18 +77,21 @@ func LoginUserByNameAndPwd(c *gin.Context) {
 // @Success 200 {string} json{"code", "message"}
 // @Router /user/createUser [get]
 func CreateUser(c *gin.Context) {
+	// user.Name = c.Query("name")
+	// password := c.Query("password")
+	// repassword := c.Query("repassword")
 	user := models.UserBasic{}
-	user.Name = c.Query("name")
-	password := c.Query("password")
-	repassword := c.Query("repassword")
-
+	user.Name = c.Request.FormValue("name")
+	password := c.Request.FormValue("password")
+	repassword := c.Request.FormValue("Identity")
+	fmt.Println(user.Name, "  >>>>>>>>>>>  ", password, repassword)
 	salt := fmt.Sprintf("%06d", rand.Int31())
 
 	data := models.FindUserByName(user.Name)
 	if user.Name == "" || password == "" || repassword == "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "The username or password cannot be empty",
+			"message": "用户名或密码不能为空！",
 			"data":    user,
 		})
 		return
@@ -96,15 +99,15 @@ func CreateUser(c *gin.Context) {
 	if data.Name != "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "Username has been registered",
+			"message": "用户名已注册！",
 			"data":    user,
 		})
 		return
 	}
 	if password != repassword {
-		c.JSON(-1, gin.H{
+		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
-			"message": "Different passwords",
+			"message": "两次密码不一致！",
 			"data":    user,
 		})
 		return
@@ -112,10 +115,14 @@ func CreateUser(c *gin.Context) {
 	//user.PassWord = password
 	user.PassWord = utils.MakePassword(password, salt)
 	user.Salt = salt
+	fmt.Println(user.PassWord)
+	user.LoginTime = time.Now()
+	user.LoginOutTime = time.Now()
+	user.HeartbeatTime = time.Now()
 	models.CreateUser(user)
 	c.JSON(200, gin.H{
 		"code":    0, //  0成功   -1失败
-		"message": "New user successfully",
+		"message": "新增用户成功！",
 		"data":    user,
 	})
 }
@@ -197,6 +204,16 @@ func SendMsg(c *gin.Context) {
 	MsgHandler(ws, c)
 }
 
+//func RedisMsg(c *gin.Context) {
+//	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
+//	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
+//	start, _ := strconv.Atoi(c.PostForm("start"))
+//	end, _ := strconv.Atoi(c.PostForm("end"))
+//	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
+//	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+//	utils.RespOKList(c.Writer, "ok", res)
+//}
+
 func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 	for {
 		msg, err := utils.Subscribe(c, utils.PublishKey)
@@ -210,4 +227,8 @@ func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 			log.Fatalln(err)
 		}
 	}
+}
+
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
 }

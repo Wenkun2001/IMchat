@@ -19,8 +19,8 @@ var (
 )
 
 func InitConfig() {
-	viper.SetConfigName("app")
 	viper.AddConfigPath("config")
+	viper.SetConfigName("app")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
@@ -65,7 +65,7 @@ const (
 
 // Publish 发布消息到Redis
 func Publish(ctx context.Context, channel string, msg string) error {
-	fmt.Println("Publish 。。。。", msg)
+	fmt.Println("Publish . . .", msg)
 	err := Red.Publish(ctx, channel, msg).Err()
 	if err != nil {
 		fmt.Println(err)
@@ -76,7 +76,7 @@ func Publish(ctx context.Context, channel string, msg string) error {
 // Subscribe 订阅Redis消息
 func Subscribe(ctx context.Context, channel string) (string, error) {
 	sub := Red.Subscribe(ctx, channel)
-	fmt.Println("Subscribe 。。。。", ctx)
+	fmt.Println("Subscribe . . .", ctx)
 	msg, err := sub.ReceiveMessage(ctx)
 	if err != nil {
 		fmt.Println(err)
